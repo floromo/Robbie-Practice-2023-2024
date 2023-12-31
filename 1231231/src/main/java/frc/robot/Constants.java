@@ -41,5 +41,13 @@ public final class Constants {
     public static final double Ki = 0;
     public static final double Kd = 0;
   }
+
+  public class WristConstants {
+    public static final int kLeftMotor = 1;
+    public static final int kRightMotor = 2;
+    public static final int kFF = 100;
+    public static final int kP = 100;
+    public static final int kD = 100;
+  }
 }
  
