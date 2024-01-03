@@ -48,6 +48,7 @@ public final class Constants {
     public static final int kFF = 100;
     public static final int kP = 100;
     public static final int kD = 100;
+    public static final double kWRIST_GEAR_RATIO = 5000;
   }
 }
  

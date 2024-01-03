@@ -48,33 +48,11 @@ public class Wrist extends SubsystemBase {
 
   static Wrist m_instance = new Wrist();
 
-  // ====================  ====================
-
-  public Wrist() {
-    configMotors();
-  }
+  SparkMaxPIDController m_PIDController = m_rightMotor.getPIDController();
 
 
-  public void configMotors() {
-    m_leftMotor.follow(m_rightMotor);
-    m_leftMotor.setInverted(true);
-    
-    m_leftMotor.restoreFactoryDefaults();
-    m_rightMotor.restoreFactoryDefaults();
-
-    m_leftMotor.setIdleMode(IdleMode.kBrake);
-    m_rightMotor.setIdleMode(IdleMode.kBrake);
-
-    m_leftMotor.setSmartCurrentLimit(35);
-    m_rightMotor.setSmartCurrentLimit(35);
-
-    SparkMaxPIDController m_PIDController = m_rightMotor.getPIDController();
-
-    m_PIDController.setFF(WristConstants.kFF);
-    m_PIDController.setP(WristConstants.kP);
-    m_PIDController.setD(WristConstants.kD);
-  }
-
+  // ==================== METHODS ====================
+  
   // GETTERS
 
   public static Wrist getInstance() {
@@ -107,17 +85,25 @@ public class Wrist extends SubsystemBase {
     m_state = state;
   }
 
-  
+  // MISC
+
+  public void goToPosition() {
+    m_PIDController.setReference(m_setPoint.getRotations() * WristConstants.kWRIST_GEAR_RATIO, ControlType.kSmartMotion);
+  }
+
   public void zero() {
     this.m_jogValue = m_limitSwitch.get() ? 0.0 : 0.1;
   }
 
+  public void OFF() {
+    set(0);
+  }
 
+  public void set(double value) {
+    m_rightMotor.set(value);
+  }
 
-
-
-
-  
+  // ==================== SUBSYSTEM ===================
 
   public CommandBase exampleMethodCommand() {
     // Inline construction of command goes here.
@@ -140,11 +126,49 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    switch(WristStates) {
+      case OFF:
+        OFF();
+        break;
+      case JOG:
+        goToPosition();
+        break;
+      case POSITION:
+        
+        break;
+      case ZERO:
+        zero();
+        break;
+    }
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  // ==================== MOTORS ====================
+
+  public Wrist() {
+    configMotors();
+  }
+
+
+  public void configMotors() {
+    m_leftMotor.follow(m_rightMotor);
+    m_leftMotor.setInverted(true);
+    
+    m_leftMotor.restoreFactoryDefaults();
+    m_rightMotor.restoreFactoryDefaults();
+
+    m_leftMotor.setIdleMode(IdleMode.kBrake);
+    m_rightMotor.setIdleMode(IdleMode.kBrake);
+
+    m_leftMotor.setSmartCurrentLimit(35);
+    m_rightMotor.setSmartCurrentLimit(35);
+
+    m_PIDController.setFF(WristConstants.kFF);
+    m_PIDController.setP(WristConstants.kP);
+    m_PIDController.setD(WristConstants.kD);
   }
 }
