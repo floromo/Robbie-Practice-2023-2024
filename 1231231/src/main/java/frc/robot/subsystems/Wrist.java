@@ -32,7 +32,7 @@ public class Wrist extends SubsystemBase {
     ZERO
   }
 
-  double m_jogValue = 0;
+  double kJogValue = 0;
   Rotation2d m_setPoint = new Rotation2d();
 
   WristStates m_state = WristStates.OFF;
@@ -60,7 +60,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public double getJogValue() {
-    return m_jogValue;
+    return kJogValue;
   }
 
   public Rotation2d getSetPoint() {
@@ -74,10 +74,11 @@ public class Wrist extends SubsystemBase {
   // SETTERS
 
   private void setJogValue(double jogValue){
-    m_jogValue = jogValue;
+    kJogValue = jogValue;
   }
 
   private void setSetPoint(Rotation2d setPoint){
+    setState(WristStates.POSITION);
     m_setPoint = setPoint;
   }
 
@@ -91,11 +92,11 @@ public class Wrist extends SubsystemBase {
     m_PIDController.setReference(m_setPoint.getRotations() * WristConstants.kWRIST_GEAR_RATIO, ControlType.kSmartMotion);
   }
 
-  public void zero() {
+  private void zero() {
     this.m_jogValue = m_limitSwitch.get() ? 0.0 : 0.1;
   }
 
-  public void OFF() {
+  private void OFF() {
     set(0);
   }
 
@@ -131,10 +132,10 @@ public class Wrist extends SubsystemBase {
         OFF();
         break;
       case JOG:
-        goToPosition();
+        set(kJogValue);
         break;
       case POSITION:
-        
+        goToPosition();
         break;
       case ZERO:
         zero();
